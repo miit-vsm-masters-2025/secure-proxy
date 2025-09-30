@@ -39,6 +39,8 @@ func proxyMiddleware(c *gin.Context) {
 }
 
 func getUsername(c *gin.Context) string {
+	// TODO: Get cookie, find username in valkey, if not found - redirect to auth
+	// Use GetExWithOptions to extend key expiration time
 	return ""
 }
 
@@ -70,6 +72,10 @@ func setupRouter() *gin.Engine {
 
 	r.Use(proxyMiddleware)
 
+	r.GET("/auth", renderAuthPage)
+	r.POST("/auth", validateTotp)
+
+	// Методы ниже нам на самом деле не нужны, но пока оставляю их для примера. Нужно будет удалить после завершения реализации.
 	r.GET("/set_cookie", func(c *gin.Context) {
 		c.SetCookie(
 			"SECURE_PROXY_SESSION",
@@ -98,6 +104,15 @@ func setupRouter() *gin.Engine {
 	})
 
 	return r
+}
+
+func renderAuthPage(c *gin.Context) {
+	// Отрендерить и вернуть html-страницу с формой для ввода логина и TOTP-кода
+}
+
+func validateTotp(c *gin.Context) {
+	// Проверить введенный TOTP. Если все ок - проставить куку и отредиректить на url, указанный в параметре redirectUrl.
+	// Если нет - отрендерить ту же форму что и в методе выше, но с сообщением об ошибке.
 }
 
 func main() {
