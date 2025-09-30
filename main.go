@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +26,20 @@ func setupRouter() *gin.Engine {
 			true,
 		)
 		c.String(http.StatusOK, "OK")
+	})
+
+	r.GET("/proxy", func(c *gin.Context) {
+		backendUrl, err := url.Parse("http://127.0.0.1:8000/")
+		if err != nil {
+			c.AbortWithError(500, err)
+			return
+		}
+		proxy := httputil.NewSingleHostReverseProxy(backendUrl)
+		proxy.Director = func(req *http.Request) {
+			req.URL = backendUrl
+			req.Header.Set("X-Forwarded-User", "dv.romanov")
+		}
+		proxy.ServeHTTP(c.Writer, c.Request)
 	})
 
 	// Ping test
