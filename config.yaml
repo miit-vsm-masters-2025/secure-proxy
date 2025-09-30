@@ -1,0 +1,13 @@
+authDomain: auth.secure-proxy.wtrn.ru
+sessions:
+  cookieDomain: .secure-proxy.wtrn.ru
+  cookieName: SECURE_PROXY_SESSION
+  ttlSeconds: 180
+users:
+  - username: user1
+    totpSecret: DU2DGNS3ALWXIGLWK7ZVBXHL7ZN6ZCAC
+    availableDomains:
+      - restaurant.secure-proxy.wtrn.ru
+upstreams:
+  - host: restaurant.secure-proxy.wtrn.ru # должен быть поддоменом .secure-proxy.lan, чтобы мы могли увидеть куку
+    destination: http://127.0.0.1:8000 # куда проксировать успешно аутентифицированные запросы
