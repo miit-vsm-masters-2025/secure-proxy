@@ -9,6 +9,8 @@ import (
 	"github.com/pquerna/otp/totp"
 	glide "github.com/valkey-io/valkey-glide/go/v2"
 	"github.com/valkey-io/valkey-glide/go/v2/config"
+	"github.com/valkey-io/valkey-glide/go/v2/constants"
+	"github.com/valkey-io/valkey-glide/go/v2/options"
 )
 
 func Test_generateKey(t *testing.T) {
@@ -49,12 +51,33 @@ func Test_valkey(t *testing.T) {
 		return
 	}
 
-	res, err := client.Ping(context.Background())
+	context := context.Background()
+	res, err := client.Ping(context)
 	if err != nil {
 		fmt.Println("There was an error: ", err)
 		return
 	}
 	fmt.Println(res) // PONG
+
+	key := "session_E364EEAE-8F50-4B6E-BB9B-E7F56A27160C"
+	value := "dv.romanov"
+
+	_, err = client.SetWithOptions(context, key, value, options.SetOptions{
+		Expiry: &options.Expiry{
+			Type:     constants.Seconds,
+			Duration: 5,
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	retrieved, err := client.Get(context, key)
+	if err != nil {
+		panic(err)
+	}
+
+	println("retrieved: ", retrieved.Value())
 
 	client.Close()
 
