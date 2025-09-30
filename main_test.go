@@ -70,7 +70,12 @@ func Test_valkey(t *testing.T) {
 		panic(err)
 	}
 
-	retrieved, err := client.Get(context, key)
+	retrieved, err := client.GetExWithOptions(context, key, options.GetExOptions{
+		Expiry: &options.Expiry{
+			Type:     constants.Seconds,
+			Duration: 60,
+		},
+	})
 	if err != nil {
 		panic(err)
 	}
