@@ -47,15 +47,13 @@ func Test_valkey(t *testing.T) {
 
 	client, err := glide.NewClient(config)
 	if err != nil {
-		fmt.Println("There was an error: ", err)
-		return
+		panic(err)
 	}
 
 	context := context.Background()
 	res, err := client.Ping(context)
 	if err != nil {
-		fmt.Println("There was an error: ", err)
-		return
+		panic(err)
 	}
 	fmt.Println(res) // PONG
 
