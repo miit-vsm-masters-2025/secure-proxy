@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -19,8 +18,33 @@ func proxyMiddleware(c *gin.Context) {
 		c.Next()
 		return
 	}
+
+	c.Abort()
 	// TODO proxy
-	_ = c.AbortWithError(404, errors.New("Proxying is not implemented yet"))
+	for i := range config.Upstreams {
+		upstream := &config.Upstreams[i]
+		if upstream.Host == host {
+			proxyRequest(upstream, c)
+			return
+		}
+	}
+
+	c.String(http.StatusNotFound, "Upstream Not Found")
+}
+
+func proxyRequest(upstream *Upstream, c *gin.Context) {
+	upstreamUrl, err := url.Parse(upstream.Destination + c.Request.RequestURI)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(upstreamUrl)
+	proxy.Director = func(req *http.Request) {
+		req.URL = upstreamUrl
+		req.Header.Set("X-Forwarded-User", "dv.romanov")
+	}
+	proxy.ServeHTTP(c.Writer, c.Request)
 }
 
 func setupRouter() *gin.Engine {

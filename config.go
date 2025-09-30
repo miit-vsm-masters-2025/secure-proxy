@@ -8,7 +8,13 @@ import (
 )
 
 type AppConfig struct {
-	AuthDomain string `yaml:"authDomain"`
+	AuthDomain string     `yaml:"authDomain"`
+	Upstreams  []Upstream `yaml:"upstreams"`
+}
+
+type Upstream struct {
+	Host        string `yaml:"host"`
+	Destination string `yaml:"destination"`
 }
 
 func createConfig() *AppConfig {
