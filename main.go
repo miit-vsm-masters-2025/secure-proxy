@@ -69,7 +69,7 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	router := setupRouter()
-	err := router.Run(":8080")
+	err := router.RunTLS(":8443", "certs/server.pem", "certs/server-key.pem")
 	if err != nil {
 		panic(err)
 	}
