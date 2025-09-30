@@ -20,6 +20,12 @@ func proxyMiddleware(c *gin.Context) {
 	}
 
 	c.Abort()
+
+	username := getUsername(c)
+	if username == "" {
+		redirectToAuth(c)
+		return
+	}
 	// TODO proxy
 	for i := range config.Upstreams {
 		upstream := &config.Upstreams[i]
@@ -30,6 +36,10 @@ func proxyMiddleware(c *gin.Context) {
 	}
 
 	c.String(http.StatusNotFound, "Upstream Not Found")
+}
+
+func getUsername(c *gin.Context) string {
+	return ""
 }
 
 func proxyRequest(upstream *Upstream, c *gin.Context) {
@@ -45,6 +55,12 @@ func proxyRequest(upstream *Upstream, c *gin.Context) {
 		req.Header.Set("X-Forwarded-User", "dv.romanov")
 	}
 	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func redirectToAuth(c *gin.Context) {
+	authenticatedRedirectUrl := "https://" + c.Request.Host + c.Request.RequestURI
+	authUrl := "https://" + config.AuthDomain + "/auth?redirectUrl=" + url.QueryEscape(authenticatedRedirectUrl)
+	c.Redirect(http.StatusFound, authUrl)
 }
 
 func setupRouter() *gin.Engine {
