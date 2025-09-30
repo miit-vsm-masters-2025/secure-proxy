@@ -5,6 +5,7 @@ go 1.25
 require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/pquerna/otp v1.5.0
+	github.com/valkey-io/valkey-glide/go/v2 v2.1.0
 )
 
 require (
