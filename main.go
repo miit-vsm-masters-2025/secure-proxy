@@ -13,6 +13,19 @@ func setupRouter() *gin.Engine {
 	// gin.DisableConsoleColor()
 	r := gin.Default()
 
+	r.GET("/set_cookie", func(c *gin.Context) {
+		c.SetCookie(
+			"SECURE_PROXY_SESSION",
+			"E364EEAE-8F50-4B6E-BB9B-E7F56A27160C",
+			2592000,
+			"/",
+			".secure-proxy.wtrn.ru",
+			true,
+			true,
+		)
+		c.String(http.StatusOK, "OK")
+	})
+
 	// Ping test
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
