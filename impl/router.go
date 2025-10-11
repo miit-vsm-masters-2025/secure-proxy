@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -53,7 +54,6 @@ func SetupRouter() *gin.Engine {
 func renderAuthPage(c *gin.Context) {
 	redirectUrl := c.Query("redirectUrl")
 	c.HTML(http.StatusOK, "auth.tmpl", gin.H{
-		"greeting":    "Hello world",
 		"redirectUrl": redirectUrl,
 	})
 	// Отрендерить и вернуть html-страницу с формой для ввода логина и TOTP-кода
@@ -63,7 +63,29 @@ func validateTotp(c *gin.Context) {
 	username := c.PostForm("username")
 	totp := c.PostForm("totp")
 	redirectUrl := c.PostForm("redirectUrl")
+
+	user, err := findUserByUsername(username)
+	if err != nil {
+		c.AbortWithError(404, err)
+		return
+	}
+
+	secret := user.TotpSecret
+	// TODO: check totp code
+	_ = secret
+
 	c.String(200, "You entered "+username+" "+totp+". Redirect url: "+redirectUrl)
+
 	// Проверить введенный TOTP. Если все ок - проставить куку и отредиректить на url, указанный в параметре redirectUrl.
 	// Если нет - отрендерить ту же форму что и в методе выше, но с сообщением об ошибке.
+}
+
+func findUserByUsername(username string) (User, error) {
+	for i := range config.Users {
+		user := config.Users[i]
+		if user.Username == username {
+			return user, nil
+		}
+	}
+	return User{}, fmt.Errorf("user %s not found", username)
 }

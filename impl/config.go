@@ -10,11 +10,18 @@ import (
 type AppConfig struct {
 	AuthDomain string     `yaml:"authDomain"`
 	Upstreams  []Upstream `yaml:"upstreams"`
+	Users      []User     `yaml:"users"`
 }
 
 type Upstream struct {
 	Host        string `yaml:"host"`
 	Destination string `yaml:"destination"`
+}
+
+type User struct {
+	Username         string   `yaml:"username"`
+	TotpSecret       string   `yaml:"totpSecret"`
+	AvailableDomains []string `yaml:"availableDomains"`
 }
 
 func createConfig() *AppConfig {
