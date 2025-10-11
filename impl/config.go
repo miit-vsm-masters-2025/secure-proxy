@@ -1,4 +1,4 @@
-package main
+package impl
 
 import (
 	"fmt"
@@ -30,3 +30,5 @@ func createConfig() *AppConfig {
 	}
 	return &config
 }
+
+var config = createConfig()
