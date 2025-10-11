@@ -8,7 +8,7 @@ import (
 
 	"github.com/pquerna/otp/totp"
 	glide "github.com/valkey-io/valkey-glide/go/v2"
-	"github.com/valkey-io/valkey-glide/go/v2/config"
+	glideConfig "github.com/valkey-io/valkey-glide/go/v2/config"
 	"github.com/valkey-io/valkey-glide/go/v2/constants"
 	"github.com/valkey-io/valkey-glide/go/v2/options"
 )
@@ -42,8 +42,8 @@ func Test_valkey(t *testing.T) {
 	host := "localhost"
 	port := 6379
 
-	config := config.NewClientConfiguration().
-		WithAddress(&config.NodeAddress{Host: host, Port: port})
+	config := glideConfig.NewClientConfiguration().
+		WithAddress(&glideConfig.NodeAddress{Host: host, Port: port})
 
 	client, err := glide.NewClient(config)
 	if err != nil {
