@@ -3,14 +3,22 @@ package impl
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type AppConfig struct {
+	CookieName string     `yaml:"cookieName"`
+	Valkey     Valkey     `yaml:"valkey"`
 	AuthDomain string     `yaml:"authDomain"`
 	Upstreams  []Upstream `yaml:"upstreams"`
 	Users      []User     `yaml:"users"`
+}
+
+type Valkey struct {
+	Address    string        `yaml:"address"`
+	SessionTtl time.Duration `yaml:"sessionTtl"`
 }
 
 type Upstream struct {
@@ -25,7 +33,13 @@ type User struct {
 }
 
 func createConfig() *AppConfig {
-	config := AppConfig{}
+	config := AppConfig{
+		CookieName: "SECURE_PROXY_SESSION",
+		Valkey: Valkey{
+			Address:    "127.0.0.1:6379",
+			SessionTtl: 600,
+		},
+	}
 	configFile, configPathOverridden := os.LookupEnv("APP_CONFIG")
 	if !configPathOverridden {
 		configFile = "config.yaml"

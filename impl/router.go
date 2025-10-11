@@ -7,6 +7,8 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/pquerna/otp/totp"
 )
 
 func SetupRouter() *gin.Engine {
@@ -62,7 +64,7 @@ func renderAuthPage(c *gin.Context) {
 
 func validateTotp(c *gin.Context) {
 	username := c.PostForm("username")
-	totp := c.PostForm("totp")
+	enteredTotpCode := c.PostForm("totp")
 	redirectUrl := c.PostForm("redirectUrl")
 
 	user, err := findUserByUsername(username)
@@ -73,9 +75,30 @@ func validateTotp(c *gin.Context) {
 
 	secret := user.TotpSecret
 	// TODO: check totp code
-	_ = secret
+	totpOk := totp.Validate(enteredTotpCode, secret)
+	if !totpOk {
+		c.AbortWithError(404, fmt.Errorf("incorrect totp code for user %s", user.Username))
+		return
+	}
 
-	c.String(200, "You entered "+username+" "+totp+". Redirect url: "+redirectUrl)
+	uuid := uuid.New().String()
+	err = valkeyClient.createSession(c, username, uuid)
+	if err != nil {
+		c.AbortWithError(500, fmt.Errorf("failed to create new session in valkey"))
+		return
+	}
+
+	c.SetCookie(
+		config.CookieName,
+		uuid,
+		2592000, // TODO: We probably should refresh cookie in middleware
+		"/",
+		config.AuthDomain,
+		true,
+		true,
+	)
+
+	c.Redirect(302, redirectUrl)
 
 	// Проверить введенный TOTP. Если все ок - проставить куку и отредиректить на url, указанный в параметре redirectUrl.
 	// Если нет - отрендерить ту же форму что и в методе выше, но с сообщением об ошибке.
