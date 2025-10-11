@@ -47,7 +47,8 @@ func getUsername(c *gin.Context) (string, error) {
 		return "", nil
 	}
 
-	username, err := sessionCache.findBySession(sessionKey)
+	username, err := valkeyClient.findUsernameBySession(c, sessionKey) // Синхронная версия, идет напрямую в valkey
+	//username, err := sessionCache.findBySession(sessionKey) // Асинхронная версия, использует под капотом дополнительное кэширование
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve username from vault: %s", err)
 	}
