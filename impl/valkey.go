@@ -13,12 +13,12 @@ type ValkeyClient struct {
 }
 
 func (c *ValkeyClient) createSession(context context.Context, username string, sessionKey string) error {
-	ttlSeconds := int64(config.Valkey.SessionTtl.Seconds())
+	ttlSeconds := int64(config.Sessions.Ttl.Seconds())
 	return c.client.Do(context, c.client.B().Setex().Key(SESSION_VALKEY_PREFIX+sessionKey).Seconds(ttlSeconds).Value(username).Build()).Error()
 }
 
 func (c *ValkeyClient) findUsernameBySession(context context.Context, sessionKey string) (string, error) {
-	retrieved, err := c.client.Do(context, c.client.B().Getex().Key(SESSION_VALKEY_PREFIX+sessionKey).Ex(config.Valkey.SessionTtl).Build()).ToString()
+	retrieved, err := c.client.Do(context, c.client.B().Getex().Key(SESSION_VALKEY_PREFIX+sessionKey).Ex(config.Sessions.Ttl).Build()).ToString()
 	return retrieved, err
 }
 

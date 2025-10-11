@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +29,7 @@ func proxyMiddleware(c *gin.Context) {
 		return
 	}
 	// TODO proxy
+	host = strings.Split(host, ":")[0] // Remove port from host
 	for i := range config.Upstreams {
 		upstream := &config.Upstreams[i]
 		if upstream.Host == host {

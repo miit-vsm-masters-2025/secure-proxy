@@ -11,14 +11,19 @@ import (
 type AppConfig struct {
 	CookieName string     `yaml:"cookieName"`
 	Valkey     Valkey     `yaml:"valkey"`
+	Sessions   Sessions   `yaml:"sessions"`
 	AuthDomain string     `yaml:"authDomain"`
 	Upstreams  []Upstream `yaml:"upstreams"`
 	Users      []User     `yaml:"users"`
 }
 
+type Sessions struct {
+	CookieDomain string        `yaml:"cookieDomain"`
+	CookieName   string        `yaml:"cookieName"`
+	Ttl          time.Duration `yaml:"ttl"`
+}
 type Valkey struct {
-	Address    string        `yaml:"address"`
-	SessionTtl time.Duration `yaml:"sessionTtl"`
+	Address string `yaml:"address"`
 }
 
 type Upstream struct {
@@ -33,22 +38,17 @@ type User struct {
 }
 
 func createConfig() *AppConfig {
-	duration, err := time.ParseDuration("10m")
-	if err != nil {
-		panic(err)
-	}
 	config := AppConfig{
 		CookieName: "SECURE_PROXY_SESSION",
 		Valkey: Valkey{
-			Address:    "127.0.0.1:6379",
-			SessionTtl: duration,
+			Address: "127.0.0.1:6379",
 		},
 	}
 	configFile, configPathOverridden := os.LookupEnv("APP_CONFIG")
 	if !configPathOverridden {
 		configFile = "config.yaml"
 	}
-	err = cleanenv.ReadConfig(configFile, &config)
+	err := cleanenv.ReadConfig(configFile, &config)
 
 	if err != nil {
 		panic(fmt.Errorf("failed to load config: %w", err))

@@ -2,7 +2,7 @@ authDomain: auth.secure-proxy.wtrn.ru:8443
 sessions:
   cookieDomain: .secure-proxy.wtrn.ru
   cookieName: SECURE_PROXY_SESSION
-  ttlSeconds: 180
+  ttl: 180s
 users:
   - username: user1
     totpSecret: DU2DGNS3ALWXIGLWK7ZVBXHL7ZN6ZCAC

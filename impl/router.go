@@ -93,7 +93,7 @@ func validateTotp(c *gin.Context) {
 		uuid,
 		2592000, // TODO: We probably should refresh cookie in middleware
 		"/",
-		config.AuthDomain,
+		config.Sessions.CookieDomain,
 		true,
 		true,
 	)
