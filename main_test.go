@@ -7,10 +7,7 @@ import (
 	"time"
 
 	"github.com/pquerna/otp/totp"
-	glide "github.com/valkey-io/valkey-glide/go/v2"
-	glideConfig "github.com/valkey-io/valkey-glide/go/v2/config"
-	"github.com/valkey-io/valkey-glide/go/v2/constants"
-	"github.com/valkey-io/valkey-glide/go/v2/options"
+	"github.com/valkey-io/valkey-go"
 )
 
 func Test_generateKey(t *testing.T) {
@@ -39,48 +36,32 @@ func Test_validateTotp(t *testing.T) {
 }
 
 func Test_valkey(t *testing.T) {
-	host := "localhost"
-	port := 6379
-
-	config := glideConfig.NewClientConfiguration().
-		WithAddress(&glideConfig.NodeAddress{Host: host, Port: port})
-
-	client, err := glide.NewClient(config)
+	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{"127.0.0.1:6379"}})
 	if err != nil {
 		panic(err)
 	}
 
 	context := context.Background()
-	res, err := client.Ping(context)
+	resp, err := client.Do(context, client.B().Ping().Build()).ToString()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(res) // PONG
+	fmt.Println(resp) // PONG
 
 	key := "session_E364EEAE-8F50-4B6E-BB9B-E7F56A27160C"
 	value := "dv.romanov"
 
-	_, err = client.SetWithOptions(context, key, value, options.SetOptions{
-		Expiry: &options.Expiry{
-			Type:     constants.Seconds,
-			Duration: 5,
-		},
-	})
+	err = client.Do(context, client.B().Setex().Key(key).Seconds(5).Value(value).Build()).Error()
 	if err != nil {
 		panic(err)
 	}
 
-	retrieved, err := client.GetExWithOptions(context, key, options.GetExOptions{
-		Expiry: &options.Expiry{
-			Type:     constants.Seconds,
-			Duration: 60,
-		},
-	})
+	retrieved, err := client.Do(context, client.B().Getex().Key(key).ExSeconds(60).Build()).ToString()
 	if err != nil {
 		panic(err)
 	}
 
-	println("retrieved: ", retrieved.Value())
+	println("retrieved: ", retrieved)
 
 	client.Close()
 
