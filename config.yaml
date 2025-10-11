@@ -1,4 +1,4 @@
-authDomain: auth.secure-proxy.wtrn.ru
+authDomain: auth.secure-proxy.wtrn.ru:8443
 sessions:
   cookieDomain: .secure-proxy.wtrn.ru
   cookieName: SECURE_PROXY_SESSION

@@ -3,14 +3,13 @@ package impl
 import (
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func proxyMiddleware(c *gin.Context) {
 	host := c.Request.Host
-	host = strings.Split(host, ":")[0]
+	//host = strings.Split(host, ":")[0]
 	if host == config.AuthDomain {
 		c.Next()
 		return
@@ -43,6 +42,6 @@ func getUsername(c *gin.Context) string {
 
 func redirectToAuth(c *gin.Context) {
 	authenticatedRedirectUrl := "https://" + c.Request.Host + c.Request.RequestURI
-	authUrl := "https://" + config.AuthDomain + "/auth?redirectUrl=" + url.QueryEscape(authenticatedRedirectUrl)
+	authUrl := "https://" + config.AuthDomain + "/?redirectUrl=" + url.QueryEscape(authenticatedRedirectUrl)
 	c.Redirect(http.StatusFound, authUrl)
 }
