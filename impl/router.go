@@ -14,6 +14,7 @@ func SetupRouter() *gin.Engine {
 	// gin.DisableConsoleColor()
 	r := gin.Default()
 
+	r.Use(errorHandlingMiddleware)
 	r.Use(proxyMiddleware)
 	r.LoadHTMLGlob("templates/*")
 
