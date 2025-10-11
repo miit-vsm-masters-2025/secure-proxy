@@ -33,18 +33,22 @@ type User struct {
 }
 
 func createConfig() *AppConfig {
+	duration, err := time.ParseDuration("10m")
+	if err != nil {
+		panic(err)
+	}
 	config := AppConfig{
 		CookieName: "SECURE_PROXY_SESSION",
 		Valkey: Valkey{
 			Address:    "127.0.0.1:6379",
-			SessionTtl: 600,
+			SessionTtl: duration,
 		},
 	}
 	configFile, configPathOverridden := os.LookupEnv("APP_CONFIG")
 	if !configPathOverridden {
 		configFile = "config.yaml"
 	}
-	err := cleanenv.ReadConfig(configFile, &config)
+	err = cleanenv.ReadConfig(configFile, &config)
 
 	if err != nil {
 		panic(fmt.Errorf("failed to load config: %w", err))

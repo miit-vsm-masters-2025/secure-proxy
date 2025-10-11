@@ -84,7 +84,7 @@ func validateTotp(c *gin.Context) {
 	uuid := uuid.New().String()
 	err = valkeyClient.createSession(c, username, uuid)
 	if err != nil {
-		c.AbortWithError(500, fmt.Errorf("failed to create new session in valkey"))
+		c.AbortWithError(500, fmt.Errorf("failed to create new session in valkey: %s", err))
 		return
 	}
 
