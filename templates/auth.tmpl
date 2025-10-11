@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auth page</title>
+    <style>
+      input {
+          margin-bottom: 5px;
+      }
+    </style>
+</head>
+<body>
+<form action="/auth" method="post">
+  <div>
+    <label for="username">Username: </label>
+    <input type="text" name="username" id="username">
+  </div>
+  <div>
+    <label for="totp">TOTP: </label>
+    <input type="text" name="totp" id="totp">
+  </div>
+  <div>
+    <input type="submit" value="Log in">
+  </div>
+</form>
+</body>
+</html>

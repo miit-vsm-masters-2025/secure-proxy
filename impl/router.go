@@ -14,6 +14,7 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	r.Use(proxyMiddleware)
+	r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", renderAuthPage)
 	r.POST("/auth", validateTotp)
@@ -50,11 +51,16 @@ func SetupRouter() *gin.Engine {
 }
 
 func renderAuthPage(c *gin.Context) {
-	c.String(200, "TODO: Render login page here")
+	c.HTML(http.StatusOK, "auth.tmpl", gin.H{
+		"greeting": "Hello world",
+	})
 	// Отрендерить и вернуть html-страницу с формой для ввода логина и TOTP-кода
 }
 
 func validateTotp(c *gin.Context) {
+	username := c.PostForm("username")
+	totp := c.PostForm("totp")
+	c.String(200, "You entered "+username+" "+totp)
 	// Проверить введенный TOTP. Если все ок - проставить куку и отредиректить на url, указанный в параметре redirectUrl.
 	// Если нет - отрендерить ту же форму что и в методе выше, но с сообщением об ошибке.
 }
