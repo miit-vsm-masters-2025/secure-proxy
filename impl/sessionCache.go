@@ -22,7 +22,7 @@ type SessionCacheResponse struct {
 	error    error
 }
 
-func (s *SessionCache) runWorker() (string, error) {
+func (s *SessionCache) runWorker() {
 	for {
 		request := <-s.requestsChan
 		sessionKey := request.sessionKey
@@ -60,11 +60,12 @@ func (s *SessionCache) findBySession(session string) (string, error) {
 }
 
 func newSessionCache() SessionCache {
-	cache := ttlcache.Cache[string, string]{}
+	cache := ttlcache.New[string, string]()
 	s := SessionCache{
-		&cache,
+		cache,
 		make(chan SessionCacheRequest),
 	}
+	go s.runWorker()
 	return s
 }
 

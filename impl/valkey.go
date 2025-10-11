@@ -18,8 +18,14 @@ func (c *ValkeyClient) createSession(context context.Context, username string, s
 }
 
 func (c *ValkeyClient) findUsernameBySession(context context.Context, sessionKey string) (string, error) {
-	retrieved, err := c.client.Do(context, c.client.B().Getex().Key(SESSION_VALKEY_PREFIX+sessionKey).Ex(config.Sessions.Ttl).Build()).ToString()
-	return retrieved, err
+	message, err := c.client.Do(context, c.client.B().Getex().Key(SESSION_VALKEY_PREFIX+sessionKey).Ex(config.Sessions.Ttl).Build()).ToMessage()
+	if message.IsNil() {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return message.ToString()
 }
 
 var valkeyClient = func() ValkeyClient {

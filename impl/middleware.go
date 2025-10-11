@@ -47,7 +47,7 @@ func getUsername(c *gin.Context) (string, error) {
 		return "", nil
 	}
 
-	username, err := valkeyClient.findUsernameBySession(c, sessionKey)
+	username, err := sessionCache.findBySession(sessionKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve username from vault: %s", err)
 	}
