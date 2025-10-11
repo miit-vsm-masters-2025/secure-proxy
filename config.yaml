@@ -9,5 +9,5 @@ users:
     availableDomains:
       - restaurant.secure-proxy.wtrn.ru
 upstreams:
-  - host: restaurant.secure-proxy.wtrn.ru # должен быть поддоменом .secure-proxy.lan, чтобы мы могли увидеть куку
-    destination: http://127.0.0.1:8000 # куда проксировать успешно аутентифицированные запросы
+  - host: google.secure-proxy.wtrn.ru # должен быть поддоменом .secure-proxy.lan, чтобы мы могли увидеть куку
+    destination: https://google.com # куда проксировать успешно аутентифицированные запросы

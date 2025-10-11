@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -17,7 +18,11 @@ func proxyMiddleware(c *gin.Context) {
 
 	c.Abort()
 
-	username := getUsername(c)
+	username, err := getUsername(c)
+	if err != nil {
+		_ = c.AbortWithError(500, err)
+		return
+	}
 	if username == "" {
 		redirectToAuth(c)
 		return
@@ -34,10 +39,18 @@ func proxyMiddleware(c *gin.Context) {
 	c.String(http.StatusNotFound, "Upstream Not Found")
 }
 
-func getUsername(c *gin.Context) string {
-	// TODO: Get cookie, find username in valkey, if not found - redirect to auth
-	// Use GetExWithOptions to extend key expiration time
-	return ""
+func getUsername(c *gin.Context) (string, error) {
+	sessionKey, err := c.Cookie(config.CookieName)
+	if err != nil {
+		return "", nil
+	}
+
+	username, err := valkeyClient.findUsernameBySession(c, sessionKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve username from vault: %s", err)
+	}
+
+	return username, nil
 }
 
 func redirectToAuth(c *gin.Context) {
