@@ -16,7 +16,7 @@ func errorHandlingMiddleware(c *gin.Context) {
 
 		for i := range c.Errors {
 			err := c.Errors[i]
-			errorMessages[i] = fmt.Sprintf("Error %d: %s", i, err.Error())
+			errorMessages[i] = fmt.Sprintf("error %d: %s", i, err.Error())
 		}
 
 		errorMessage := strings.Join(errorMessages, "\n")
